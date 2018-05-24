@@ -1,0 +1,17 @@
+get_dependency_function:
+input: name
+ouput: list of names
+
+erklärung:
+zu einem Namen wird eine liste von namen ausgegeben zu denen abhängigkeit besteht
+
+solver:
+Input: list of names
+Input_last: function to call  
+ouput:list of names
+
+erklärung
+intern wird zu jeden namen in der liste mittels der letzten funktion die einzelen Abhängigkeiten bestimmt.
+
+diese werden intern dann sortiert in eine Abhängigkeitsliste
+
