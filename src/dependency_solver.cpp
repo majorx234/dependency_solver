@@ -9,26 +9,42 @@
 using namespace boost;
 
 
-DependencySolver::DependencySolver(std::vector<std::vector<std::string>> dependency_lists)
+DependencySolver::DependencySolver(std::vector<std::vector<std::string>> dep_lists)
 {
   unsigned int nelements = 0;
-  for(auto dep_list : dependency_lists) {
+  for(auto dep_list : dep_lists) {
     auto ref_dependency = dep_list.front();
-    elements.push_back(ref_dependency);
-    nelements++;
-    unsigned int ref_dependency_id = nelements;
+    int key_element = 0;
+    if(elements.find(ref_dependency) == elements.map_end())
+    { // grap
+      key_element = elements.push_back(ref_dependency);
+      nelements++;         
+    }
+    else
+    {
+      key_element = elements[ref_dependency];
+    }
     for(auto& i : dep_list) {
-      if(i != ref_dependency)
+      int key_dependency = 0;
+      if(i.compare(ref_dependency) != 0 )
       {
-        elements.push_back(i);
-        nelements++;
-        Edge dep( ref_dependency_id-1, nelements-1);
+        if(elements.find(i) == elements.map_end())
+        {  //grap too
+          key_dependency = elements.push_back(i);
+          nelements++;
+        }
+        else
+        {
+          key_dependency = elements[i];
+        }   
+        Edge dep( key_dependency, key_element);
         neededBy.push_back(dep);
       }
     }
   }
+  // maybe need in the future
   // std::size_t nedges = neededBy.size();
-  Graph dependency_graph(neededBy.begin() ,neededBy.end() ,nelements);
+  dependency_graph = std::make_shared<Graph>(Graph(neededBy.begin() ,neededBy.end() ,nelements));
 }
 
 DependencySolver::~DependencySolver()
@@ -44,12 +60,15 @@ void DependencySolver::printEdges()
   }
 }
 
-std::vector<std::string> getOrderedList()
+int DependencySolver::getOrderedList(std::vector<std::string> *ordered_list)
 {
   typedef std::list<Vertex> MakeOrder;
-  MakeOrder::iterator i;
   MakeOrder make_order;
 
-  topological_sort(g, std::front_inserter(make_order));
-  
+  topological_sort((*dependency_graph), std::front_inserter(make_order));
+  for (auto& index : make_order)
+  {
+      ordered_list->push_back(elements[index]);
+  }
+  return 0;
 }
